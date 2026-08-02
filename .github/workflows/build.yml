@@ -7,24 +7,28 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Get Date
-      id: date
-      run: echo "date=$(date +'%Y-%m-%d-%H%M%S')" >> $GITHUB_ENV
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython==0.29.33 kivy
 
     - name: Build with Buildozer
-      uses: ArtemSydoryk/buildozer-action@v1
-      with:
-        command: buildozer -v android debug
-        subpath: '.'
+      run: |
+        yes | buildozer -v android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
-        name: package-debug-${{ env.date }}
+        name: package-debug
         path: bin/*.apk
         
